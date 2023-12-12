@@ -17,3 +17,17 @@ jobs:
           projectId: w3w-to-pass
         env:
             FIREBASE_CLI_EXPERIMENTS: webframeworks
+        id: deployer
+      - name: Run Dastardly Action Step
+        continue-on-error: true                        # This allows subsequent steps to run even if this step fails
+        uses: PortSwigger/dastardly-github-action@main
+        with:
+          target-url: ${{deployer.outputs.urls}}
+  
+      # You can replace this next step with any JUnit XML parser of your choosing
+      - name: Publish Test Report
+        if: always()                                    # Forces this step to always run
+        uses: mikepenz/action-junit-report@v3
+        with:
+          report_paths: '**/dastardly-report.xml'       # You need to update this path if you pass in a different output filename to the Dastardly action
+          require_tests: true
