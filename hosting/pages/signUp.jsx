@@ -10,7 +10,6 @@ import Banner from '../components/Banner.jsx';
 import sendTo from '../components/pushTo.jsx';
 import { useRouter } from 'next/router';
 
-
 // setup the step content
 const step1Content = (
   <div className="pt-10 sm:p-10 m-10">
