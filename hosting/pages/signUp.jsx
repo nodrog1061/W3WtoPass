@@ -6,6 +6,10 @@ import "react-step-progress/dist/index.css";
 import MapComponent from "../components/MapSelector.jsx";
 import W3Wpresentor from "../components/W3WPresentor.jsx";
 import { useAuthStore } from "../context/authState.jsx";
+import Banner from '../components/Banner.jsx';
+import sendTo from '../components/pushTo.jsx';
+import { useRouter } from 'next/router';
+
 
 // setup the step content
 const step1Content = (
@@ -32,7 +36,7 @@ const step1Content = (
         // onChange={handleIdChange}
         maxLength="5"
         minLength="5"
-        // disabled={loading}
+      // disabled={loading}
       />
     </div>
   </div>
@@ -133,15 +137,9 @@ const step2Content = (
   </div>
 );
 
-const step3Content = <h1>Step 3 Content</h1>;
-
 // setup step validators, will be called before proceeding to the next step
-function step1Validator() {
-  // return a boolean
-  return true;
-}
 
-function step2Validator() {
+function step1Validator() {
   return (
     document.getElementById("connect").checked &&
     document.getElementById("store").checked &&
@@ -150,82 +148,118 @@ function step2Validator() {
   );
 }
 
-function step3Validator(w3wLoc) {
-  // return a boolean
+function step2Validator() {
+  const w3wLoc = useAuthStore.getState().w3wLoc
   console.log("fromValidator:", w3wLoc);
-  return w3wLoc[0] !== "" && w3wLoc[1] !== "" && w3wLoc[2] !== "";
+  
+  // return a boolean
+  // console.log("fromValidator:", w3wLoc);
+  // console.log((w3wLoc[0] !== undefined && w3wLoc[1] !== undefined && w3wLoc[2] !== undefined))
+  return (w3wLoc[0] !== undefined);
 }
 
-function onFormSubmit() {
-  // handle the submit logic here
-  // This function will be executed at the last step
-  // when the submit button (next button in the previous steps) is pressed
+function step3Validator() {
+  return true;
 }
 
 export default function SignUpComponent() {
-  const { w3wLoc } = useAuthStore();
+  let router= useRouter();
+  const { w3wLoc, coordinates, uid, setLoading, loading, error, setError } = useAuthStore();
+  const [mapError, setMapError] = useState(false);
 
-  console.warn(w3wLoc !== "" && w3wLoc[1] !== "" && w3wLoc[2] !== "");
+  async function onFormSubmit() {
+  
+    setError(false);
+    // setLoading(true);
+  
+    var details = {
+      'uid': uid,
+      'lat': coordinates[0],
+      'long': coordinates[1],
+      'w3w': w3wLoc
+    };
+    var formBody = JSON.stringify(details);
+  
+    // const response = await fetch('/api/signUp', {
+    const response = await fetch('http://127.0.0.1:5001/w3w-to-pass/us-central1/signUp', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: formBody
+    });
+    if (response.ok) {
+      router.push('/success');
+  
+    } else {
+      setError(true);
+      router.push('/');
+    }
+    // setLoading(false);
+  
+  }
+
+
+
+  console.info("uid:", uid);
 
   return (
-    <StepProgressBar
-      startingStep={2}
-      onSubmit={onFormSubmit}
-      steps={[
-        {
-          label: "Step 1",
-          name: "step 1",
-          content: step1Content,
-          validator: step1Validator,
-        },
-        {
-          label: "Step 2",
-          name: "step 2",
-          content: step2Content,
-          validator: step2Validator,
-        },
-        {
-          label: "Step 3",
-          name: "step 3",
-          content: (
-            <div className="pt-10 sm:p-10 m-10">
-              {/* <W3Wpresentor readOnly={true} /> */}
-              <h2 className="mb-4 text-2xl tracking-tight text-gray-900 sm:text-2xl">
-                Map Location
-              </h2>
+    <>
+      {error && <Banner type="error">There was an error verifying your details. Please try again.</Banner>}
+      <StepProgressBar
+        startingStep={1}
+        onSubmit={onFormSubmit}
+        steps={[
+          {
+            label: "Step 1",
+            name: "step 1",
+            content: step2Content,
+            validator: step1Validator,
+          },
+          {
+            label: "Step 2",
+            name: "step 2",
+            content: (
+              <div className="sm:px-10 mx-10">
+                {/* <W3Wpresentor readOnly={true} /> */}
+                <h2 className="mb-4 text-2xl tracking-tight text-gray-900 sm:text-2xl">
+                  Map Location
+                </h2>
 
-              <p className="mb-6">
-                Please select a location on the map below that you can easily
-                remember. This will be used to generate a 3 word pass phrase for
-                you to use as your password. you should try to remember this,
-                but it shoud also not be something that is easy to guess.
-              </p>
-              <MapComponent />
-            </div>
-          ),
-          validator: step3Validator(w3wLoc),
-        },
-        {
-          label: "Step 4",
-          name: "step 4",
-          content: (
-            <div className="pt-10 sm:p-10 m-10">
-              <h2 className="mb-4 text-2xl tracking-tight text-gray-900 sm:text-2xl">
-                Pass Phrase
-              </h2>
+                <p className="mb-6">
+                  Please select a location on the map below that you can easily
+                  remember. This will be used to generate a 3 word pass phrase for
+                  you to use as your password. you should try to remember this,
+                  but it shoud also not be something that is easy to guess.
+                </p>
+                <Banner type="info" >Please ensure you have seleted a location on the map before continuing.</Banner>
+                <MapComponent />
+              </div>
+            ),
+            validator: step2Validator(),
+          },
+          {
+            label: "Step 3",
+            name: "step 3",
+            content: (
+              <div className="pt-10 sm:p-10 m-10">
+                <h2 className="mb-4 text-2xl tracking-tight text-gray-900 sm:text-2xl">
+                  Pass Phrase
+                </h2>
 
-              <p className="mb-6">
-                From the location you chose on the last page we have generated a
-                3 word pass phrase for you. You should store this how you'd
-                normaly store a password. you'll be promped on this at sceduled
-                periods as part of the study.
-              </p>
-              <W3Wpresentor readOnly={true} />
-            </div>
-          ),
-          validator: step3Validator,
-        },
-      ]}
-    />
+                <p className="mb-6">
+                  From the location you chose on the last page we have generated a
+                  3 word pass phrase for you. You should store this how you'd
+                  normaly store a password. you'll be promped on this at sceduled
+                  periods as part of the study.
+                </p>
+                <W3Wpresentor readOnly={true} setError={setError}/>
+              </div>
+            ),
+            validator: step2Validator,
+          },
+        ]}
+      />
+    </>
   );
 }
