@@ -6,9 +6,9 @@ import "react-step-progress/dist/index.css";
 import MapComponent from "../components/MapSelector.jsx";
 import W3Wpresentor from "../components/W3WPresentor.jsx";
 import { useAuthStore } from "../context/authState.jsx";
-import Banner from '../components/Banner.jsx';
-import sendTo from '../components/pushTo.jsx';
-import { useRouter } from 'next/router';
+import Banner from "../components/Banner.jsx";
+import sendTo from "../components/pushTo.jsx";
+import { useRouter } from "next/router";
 
 // setup the step content
 const step1Content = (
@@ -35,7 +35,7 @@ const step1Content = (
         // onChange={handleIdChange}
         maxLength="5"
         minLength="5"
-      // disabled={loading}
+        // disabled={loading}
       />
     </div>
   </div>
@@ -148,13 +148,13 @@ function step1Validator() {
 }
 
 function step2Validator() {
-  const w3wLoc = useAuthStore.getState().w3wLoc
+  const w3wLoc = useAuthStore.getState().w3wLoc;
   console.log("fromValidator:", w3wLoc);
-  
+
   // return a boolean
   // console.log("fromValidator:", w3wLoc);
   // console.log((w3wLoc[0] !== undefined && w3wLoc[1] !== undefined && w3wLoc[2] !== undefined))
-  return (w3wLoc[0] !== undefined);
+  return w3wLoc[0] !== undefined;
 }
 
 function step3Validator() {
@@ -162,48 +162,48 @@ function step3Validator() {
 }
 
 export default function SignUpComponent() {
-  let router= useRouter();
-  const { w3wLoc, coordinates, uid, setLoading, loading, error, setError } = useAuthStore();
+  let router = useRouter();
+  const { w3wLoc, coordinates, uid, setLoading, loading, error, setError } =
+    useAuthStore();
   const [mapError, setMapError] = useState(false);
 
   async function onFormSubmit() {
-  
     setError(false);
     // setLoading(true);
-  
+
     var details = {
-      'uid': uid,
-      'lat': coordinates[0],
-      'long': coordinates[1],
-      'w3w': w3wLoc
+      uid: uid,
+      lat: coordinates[0],
+      long: coordinates[1],
+      w3w: w3wLoc,
     };
     var formBody = JSON.stringify(details);
-  
-    const response = await fetch('/api/signUp', {
-      method: 'POST',
+
+    const response = await fetch("/api/signUp", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
-      body: formBody
+      body: formBody,
     });
     if (response.ok) {
-      router.push('/success');
-  
+      router.push("/success");
     } else {
       setError(true);
-      router.push('/');
+      router.push("/");
     }
     // setLoading(false);
-  
   }
-
-
 
   console.info("uid:", uid);
 
   return (
     <>
-      {error && <Banner type="error">There was an error verifying your details. Please try again.</Banner>}
+      {error && (
+        <Banner type="error">
+          There was an error verifying your details. Please try again.
+        </Banner>
+      )}
       <StepProgressBar
         startingStep={1}
         onSubmit={onFormSubmit}
@@ -226,11 +226,15 @@ export default function SignUpComponent() {
 
                 <p className="mb-6">
                   Please select a location on the map below that you can easily
-                  remember. This will be used to generate a 3 word pass phrase for
-                  you to use as your password. you should try to remember this,
-                  but it shoud also not be something that is easy to guess.
+                  remember. This will be used to generate a 3 word pass phrase
+                  for you to use as your password. you should try to remember
+                  this, but it shoud also not be something that is easy to
+                  guess.
                 </p>
-                <Banner type="info" >Please ensure you have seleted a location on the map before continuing.</Banner>
+                <Banner type="info">
+                  Please ensure you have seleted a location on the map before
+                  continuing.
+                </Banner>
                 <MapComponent />
               </div>
             ),
@@ -246,12 +250,12 @@ export default function SignUpComponent() {
                 </h2>
 
                 <p className="mb-6">
-                  From the location you chose on the last page we have generated a
-                  3 word pass phrase for you. You should store this how you'd
-                  normaly store a password. you'll be promped on this at sceduled
-                  periods as part of the study.
+                  From the location you chose on the last page we have generated
+                  a 3 word pass phrase for you. You should store this how you'd
+                  normaly store a password. you'll be promped on this at
+                  sceduled periods as part of the study.
                 </p>
-                <W3Wpresentor readOnly={true} setError={setError}/>
+                <W3Wpresentor readOnly={true} setError={setError} />
               </div>
             ),
             validator: step2Validator,

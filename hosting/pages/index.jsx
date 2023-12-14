@@ -1,44 +1,43 @@
 import Link from "next/link";
 import { useAuthStore } from "../context/authState.jsx";
-import { useState } from 'react';
-import Banner from '../components/Banner.jsx';
-import { useRouter } from 'next/router';
+import { useState } from "react";
+import Banner from "../components/Banner.jsx";
+import { useRouter } from "next/router";
 
 async function verifyID(uid, setError, setLoading) {
   setLoading(true);
   var details = {
-    'uid': uid,
+    uid: uid,
   };
   var formBody = JSON.stringify(details);
 
-  const response = await fetch('/api/checkID', {
-    method: 'POST',
+  const response = await fetch("/api/checkID", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json",
     },
-    body: formBody
+    body: formBody,
   });
   setError(!response.ok);
   setLoading(false);
-  return response.json();;
+  return response.json();
 }
 
 export default function IndexPage() {
-
   const { setUid, uid, loading, setLoading, error, setError } = useAuthStore();
-  let router= useRouter();
+  let router = useRouter();
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-    let idDets = await verifyID(uid, setError, setLoading)
-    if ( idDets['accountSetupCompleted']) {
-      router.push('/login')
+    let idDets = await verifyID(uid, setError, setLoading);
+    if (idDets["accountSetupCompleted"]) {
+      router.push("/login");
       setError(false);
-    }else{
-      router.push('/signUp')
+    } else {
+      router.push("/signUp");
       setError(false);
     }
-  }
+  };
 
   return (
     <div className="pt-10 sm:p-10 m-10">
@@ -49,7 +48,11 @@ export default function IndexPage() {
         Before we get started, we need to get your approval on a few things.
       </p>
       <div className="border-t border-gray-900/10 pt-5 pl-5">
-      {error && <Banner type="error">There was an error verifying your details. Please try again.</Banner>}
+        {error && (
+          <Banner type="error">
+            There was an error verifying your details. Please try again.
+          </Banner>
+        )}
         <h2 className="text-base font-semibold leading-7 text-gray-900 mt-6">
           Register Your Account
         </h2>
@@ -67,7 +70,7 @@ export default function IndexPage() {
             onChange={(e) => setUid(e.target.value)}
             maxLength="4"
             minLength="4"
-          disabled={loading}
+            disabled={loading}
           />
           <button
             disabled={loading}

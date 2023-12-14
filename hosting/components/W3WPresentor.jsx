@@ -1,22 +1,27 @@
 import { useAuthStore } from "../context/authState.jsx";
 import { useState, useEffect } from "react";
-import Banner from './Banner.jsx';
+import Banner from "./Banner.jsx";
 
-export default function W3Wpresentor({ readOnly, setW3w = () => { } }) {
+export default function W3Wpresentor({ readOnly, setW3w = () => {} }) {
   const { w3wLoc } = useAuthStore();
   const [error, setError] = useState(false);
 
-  
-
   useEffect(() => {
     setError(readOnly && w3wLoc[0] === undefined);
-  }, [])
+  }, []);
 
   return (
     <>
-      {error && <Banner type="error" >Please return to the previous step and select a location on the map.</Banner>}
+      {error && (
+        <Banner type="error">
+          Please return to the previous step and select a location on the map.
+        </Banner>
+      )}
       <div className="flex flex-col mt-2">
-        <label htmlFor="w3w" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="w3w"
+          className="block text-sm font-medium text-gray-700"
+        >
           Your Pass phrase
         </label>
         <div className="mt-1 flex rounded-md shadow-sm">

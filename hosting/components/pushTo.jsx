@@ -1,11 +1,10 @@
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 
 export default function useAuthentication(sentTo) {
-    const router = useRouter();
+  const router = useRouter();
 
-    useEffect(() => {
-        router.push(sentTo);
-
-    }, [router]);
+  useEffect(() => {
+    router.push(sentTo);
+  }, [router]);
 }
