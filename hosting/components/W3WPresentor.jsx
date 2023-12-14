@@ -2,7 +2,7 @@ import { useAuthStore } from "../context/authState.jsx";
 import { useState, useEffect } from "react";
 import Banner from "./Banner.jsx";
 
-export default function W3Wpresentor({ readOnly, setW3w = () => {} }) {
+export default function W3Wpresentor({ readOnly, setW3w = () => { } }) {
   const { w3wLoc } = useAuthStore();
   const [error, setError] = useState(false);
 
