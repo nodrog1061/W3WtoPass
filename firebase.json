@@ -9,7 +9,7 @@
     "frameworksBackend": {
       "region": "europe-west1"
     },
-    "rewrites": [ 
+    "rewrites": [
       {
         "source": "/api/checkID",
         "function": "checkID"
@@ -30,7 +30,7 @@
         "source": "/api/signUp",
         "function": "signUp"
       }
-   ]
+    ]
   },
   "functions": [
     {
