@@ -8,7 +8,29 @@
     ],
     "frameworksBackend": {
       "region": "europe-west1"
-    }
+    },
+    "rewrites": [ 
+      {
+        "source": "/api/checkID",
+        "function": "checkID"
+      },
+      {
+        "source": "/api/automatedRegistration",
+        "function": "automatedRegistration"
+      },
+      {
+        "source": "/api/login",
+        "function": "login"
+      },
+      {
+        "source": "/api/startLogin",
+        "function": "startLogin"
+      },
+      {
+        "source": "/api/signUp",
+        "function": "signUp"
+      }
+   ]
   },
   "functions": [
     {

@@ -179,8 +179,7 @@ export default function SignUpComponent() {
     };
     var formBody = JSON.stringify(details);
   
-    // const response = await fetch('/api/signUp', {
-    const response = await fetch('http://127.0.0.1:5001/w3w-to-pass/us-central1/signUp', {
+    const response = await fetch('/api/signUp', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
