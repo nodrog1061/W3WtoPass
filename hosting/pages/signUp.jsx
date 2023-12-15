@@ -238,7 +238,7 @@ export default function SignUpComponent() {
                 <MapComponent />
               </div>
             ),
-            validator: step2Validator(),
+            validator: step2Validator,
           },
           {
             label: "Step 3",
