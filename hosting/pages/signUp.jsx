@@ -35,7 +35,7 @@ const step1Content = (
         // onChange={handleIdChange}
         maxLength="5"
         minLength="5"
-      // disabled={loading}
+        // disabled={loading}
       />
     </div>
   </div>

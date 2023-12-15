@@ -19,5 +19,6 @@ export const useAuthStore = create((set) => ({
   setUid: (uid) => set(() => ({ uid: uid })),
   setLoading: (loading) => set(() => ({ loading: loading })),
   setError: (error) => set(() => ({ error: error })),
-  setIncorectLogin: (incorectLogin) => set(() => ({ incorectLogin: incorectLogin })),
+  setIncorectLogin: (incorectLogin) =>
+    set(() => ({ incorectLogin: incorectLogin })),
 }));

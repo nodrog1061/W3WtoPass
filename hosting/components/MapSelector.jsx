@@ -33,7 +33,7 @@ export default function MapComponent({ login = false }) {
       coordinatesToW3W(
         { latitude: evt.lngLat.lat, longitude: evt.lngLat.lng },
         setw3wLoc,
-      )
+      );
     }
   };
 
@@ -60,14 +60,14 @@ export default function MapComponent({ login = false }) {
         }
       >
         <ZoomControl />
-        { coordinates[0] !== undefined &&
+        {coordinates[0] !== undefined && (
           <Marker coordinates={coordinates} anchor="bottom">
             <img
               className="w-16"
               src="https://raw.githubusercontent.com/mapbox/mapbox-gl-styles/master/sprites/basic-v9/_svg/marker-11.svg"
             />
           </Marker>
-        }
+        )}
       </Map>
     </>
   );

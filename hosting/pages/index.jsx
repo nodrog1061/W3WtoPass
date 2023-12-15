@@ -41,7 +41,8 @@ async function startLogin() {
 }
 
 export default function IndexPage() {
-  const { setUid, uid, loading, setLoading, error, setError, incorectLogin } = useAuthStore();
+  const { setUid, uid, loading, setLoading, error, setError, incorectLogin } =
+    useAuthStore();
   let router = useRouter();
 
   const handleFormSubmit = async (event) => {
@@ -72,9 +73,9 @@ export default function IndexPage() {
           </Banner>
         )}
         {incorectLogin && (
-            <Banner type="error">
+          <Banner type="error">
             The login details you entered were incorrect. Please try again.
-            </Banner>
+          </Banner>
         )}
         <h2 className="text-base font-semibold leading-7 text-gray-900 mt-6">
           Register Your Account
