@@ -101,7 +101,7 @@ exports.checkID = onRequest(async (request, response) => {
       }
     })
     .catch(function (error) {
-      response.status(400).send("Error getting document: " + error);
+      response.status(500).send("Error getting document: " + error);
     });
 });
 
@@ -143,7 +143,7 @@ exports.signUp = onRequest(async (request, response) => {
       return response.status(200).send("Successfully updated!");
     })
     .catch(function (error) {
-      return response.status(400).send("Error updating document: " + error);
+      return response.status(500).send("Error updating document: " + error);
     });
 });
 
@@ -171,7 +171,7 @@ exports.startLogin = onRequest(async (request, response) => {
       return response.status(200).send("Successfully updated!");
     })
     .catch(function (error) {
-      return response.status(400).send("Error updating document: " + error);
+      return response.status(500).send("Error updating document: " + error);
     });
 });
 
@@ -209,8 +209,9 @@ exports.login = onRequest(async (request, response) => {
       cod
         .update({
           savedAttemptes: {
-            ...(await cod.get()).data()["savedAttemptes"],
+            ...respo["savedAttemptes"],
             [new Date().toLocaleDateString()]: {
+              ...respo["savedAttemptes"][new Date().toLocaleDateString()],
               end: new Date().toISOString(),
             },
           },
@@ -219,14 +220,15 @@ exports.login = onRequest(async (request, response) => {
           return response.status(200).send("Ok");
         })
         .catch(function (error) {
-          return response.status(400).send("Error updating document: " + error);
+          return response.status(500).send("Error updating document: " + error);
         });
     } else {
       cod
         .update({
           savedAttemptes: {
-            ...(await cod.get()).data()["savedAttemptes"],
+            ...respo["savedAttemptes"],
             [new Date().toLocaleDateString()]: {
+              ...respo["savedAttemptes"][new Date().toLocaleDateString()],
               [new Date().toISOString()]: "Wrong location",
             },
           },
@@ -235,15 +237,16 @@ exports.login = onRequest(async (request, response) => {
           return response.status(401).send("Wrong location");
         })
         .catch(function (error) {
-          return response.status(401).send("Error updating document: " + error);
+          return response.status(500).send("Error updating document: " + error);
         });
     }
   } else {
     cod
       .update({
         savedAttemptes: {
-          ...(await cod.get()).data()["savedAttemptes"],
+          ...respo["savedAttemptes"],
           [new Date().toLocaleDateString()]: {
+            ...respo["savedAttemptes"][new Date().toLocaleDateString()],
             [new Date().toISOString()]: "Wrong W3W",
           },
         },
@@ -252,10 +255,9 @@ exports.login = onRequest(async (request, response) => {
         return response.status(401).send("Wrong W3W");
       })
       .catch(function (error) {
-        return response.status(401).send("Error updating document: " + error);
+        return response.status(500).send("Error updating document: " + error);
       });
   }
-  return response.status(401).send("An error occured");
 });
 
 /**

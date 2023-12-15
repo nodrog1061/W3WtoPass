@@ -22,20 +22,19 @@ export async function coordinatesToW3W(latLng, setw3wLoc) {
   setw3wLoc(data.words.split("."));
 }
 
-export default function MapComponent() {
-  const [coordinates, setCoordinates] = useState([
-    54.96740864328492, -1.6076014583348253,
-  ]);
+export default function MapComponent({ login = false }) {
   const locLimited = false;
-  const { setw3wLoc } = useAuthStore();
+  const { setw3wLoc, setCoordinates, coordinates } = useAuthStore();
 
   const handleMapClick = async (map, evt) => {
     setCoordinates([evt.lngLat.lng, evt.lngLat.lat]);
     console.log(evt.lngLat.lng, evt.lngLat.lat);
-    coordinatesToW3W(
-      { latitude: evt.lngLat.lat, longitude: evt.lngLat.lng },
-      setw3wLoc,
-    );
+    if (!login) {
+      coordinatesToW3W(
+        { latitude: evt.lngLat.lat, longitude: evt.lngLat.lng },
+        setw3wLoc,
+      );
+    }
   };
 
   return (
@@ -61,12 +60,14 @@ export default function MapComponent() {
         }
       >
         <ZoomControl />
-        <Marker coordinates={coordinates} anchor="bottom">
-          <img
-            className="w-16"
-            src="https://raw.githubusercontent.com/mapbox/mapbox-gl-styles/master/sprites/basic-v9/_svg/marker-11.svg"
-          />
-        </Marker>
+        {coordinates[0] !== undefined && (
+          <Marker coordinates={coordinates} anchor="bottom">
+            <img
+              className="w-16"
+              src="https://raw.githubusercontent.com/mapbox/mapbox-gl-styles/master/sprites/basic-v9/_svg/marker-11.svg"
+            />
+          </Marker>
+        )}
       </Map>
     </>
   );

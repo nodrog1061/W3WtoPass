@@ -4,7 +4,8 @@ import { useState } from "react";
 import Banner from "../components/Banner.jsx";
 import { useRouter } from "next/router";
 
-async function verifyID(uid, setError, setLoading) {
+async function verifyID(setError, setLoading) {
+  const uid = useAuthStore.getState().uid;
   setLoading(true);
   var details = {
     uid: uid,
@@ -23,19 +24,37 @@ async function verifyID(uid, setError, setLoading) {
   return response.json();
 }
 
+async function startLogin() {
+  const uid = useAuthStore.getState().uid;
+  var details = {
+    uid: uid,
+  };
+  var formBody = JSON.stringify(details);
+
+  const response = await fetch("/api/startLogin", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: formBody,
+  });
+}
+
 export default function IndexPage() {
-  const { setUid, uid, loading, setLoading, error, setError } = useAuthStore();
+  const { setUid, uid, loading, setLoading, error, setError, incorectLogin } =
+    useAuthStore();
   let router = useRouter();
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-    let idDets = await verifyID(uid, setError, setLoading);
+    let idDets = await verifyID(setError, setLoading);
     if (idDets["accountSetupCompleted"]) {
+      await startLogin();
+      setError(false);
       router.push("/login");
-      setError(false);
     } else {
-      router.push("/signUp");
       setError(false);
+      router.push("/signUp");
     }
   };
 
@@ -51,6 +70,11 @@ export default function IndexPage() {
         {error && (
           <Banner type="error">
             There was an error verifying your details. Please try again.
+          </Banner>
+        )}
+        {incorectLogin && (
+          <Banner type="error">
+            The login details you entered were incorrect. Please try again.
           </Banner>
         )}
         <h2 className="text-base font-semibold leading-7 text-gray-900 mt-6">
@@ -71,6 +95,7 @@ export default function IndexPage() {
             maxLength="4"
             minLength="4"
             disabled={loading}
+            value={uid}
           />
           <button
             disabled={loading}
