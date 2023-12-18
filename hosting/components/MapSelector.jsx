@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import ReactMapboxGl, {
   Layer,
   Feature,
@@ -24,11 +24,14 @@ export async function coordinatesToW3W(latLng, setw3wLoc) {
 
 export default function MapComponent({ login = false }) {
   const locLimited = false;
-  const { setw3wLoc, setCoordinates, coordinates } = useAuthStore();
+  const { setw3wLoc, setCoordinates, coordinates, setMapCompleationTime } =
+    useAuthStore();
+  const [startLoc, setStartLoc] = useState();
 
   const handleMapClick = async (map, evt) => {
     setCoordinates([evt.lngLat.lng, evt.lngLat.lat]);
     console.log(evt.lngLat.lng, evt.lngLat.lat);
+    setMapCompleationTime(new Date().toISOString());
     if (!login) {
       coordinatesToW3W(
         { latitude: evt.lngLat.lat, longitude: evt.lngLat.lng },
@@ -37,10 +40,23 @@ export default function MapComponent({ login = false }) {
     }
   };
 
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      // Retrieve latitude & longitude coordinates from `navigator.geolocation` Web API
+      navigator.geolocation.getCurrentPosition(({ coords }) => {
+        const { latitude, longitude } = coords;
+        setStartLoc({ latitude, longitude });
+      });
+    }
+  }, []);
+
   return (
     <>
       <Map
         style="mapbox://styles/mapbox/streets-v9"
+        dragRotate={false}
+        dragPan={false}
+        attributionControl={false}
         containerStyle={{
           height: "300px",
           width: "100%",
@@ -57,6 +73,11 @@ export default function MapComponent({ login = false }) {
             [-0.1885, 51.4379],
             [0.0287, 51.5851],
           ]
+        }
+        center={
+          startLoc
+            ? [startLoc.longitude, startLoc.latitude]
+            : [-0.2416815, 51.5285582]
         }
       >
         <ZoomControl />

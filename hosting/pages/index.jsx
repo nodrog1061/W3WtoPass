@@ -24,32 +24,24 @@ async function verifyID(setError, setLoading) {
   return response.json();
 }
 
-async function startLogin() {
-  const uid = useAuthStore.getState().uid;
-  var details = {
-    uid: uid,
-  };
-  var formBody = JSON.stringify(details);
-
-  const response = await fetch("/api/startLogin", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: formBody,
-  });
-}
-
 export default function IndexPage() {
-  const { setUid, uid, loading, setLoading, error, setError, incorectLogin } =
-    useAuthStore();
+  const {
+    setUid,
+    uid,
+    loading,
+    setLoading,
+    error,
+    setError,
+    incorectLogin,
+    setStartLogin,
+  } = useAuthStore();
   let router = useRouter();
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     let idDets = await verifyID(setError, setLoading);
     if (idDets["accountSetupCompleted"]) {
-      await startLogin();
+      setStartLogin(new Date().toISOString());
       setError(false);
       router.push("/login");
     } else {
@@ -63,10 +55,10 @@ export default function IndexPage() {
       <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
         Welcome to W3W to Pass
       </h1>
-      <p className="text-xl leading-8 text-gray-600">
-        Before we get started, we need to get your approval on a few things.
+      <p className="text-xl leading-8 text-gray-600 border-t border-gray-900/10 ">
+        Please Enter your Referal number that you where sent by email.
       </p>
-      <div className="border-t border-gray-900/10 pt-5 pl-5">
+      <div>
         {error && (
           <Banner type="error">
             There was an error verifying your details. Please try again.
@@ -77,12 +69,6 @@ export default function IndexPage() {
             The login details you entered were incorrect. Please try again.
           </Banner>
         )}
-        <h2 className="text-base font-semibold leading-7 text-gray-900 mt-6">
-          Register Your Account
-        </h2>
-        <p className="mt-1 text-sm leading-6 text-gray-600">
-          Please Enter your Referal number that you where sent by email.
-        </p>
 
         <form className="space-y-6 mt-6" onSubmit={handleFormSubmit}>
           <input

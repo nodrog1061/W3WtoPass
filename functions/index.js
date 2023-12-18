@@ -163,7 +163,8 @@ exports.startLogin = onRequest(async (request, response) => {
       savedAttemptes: {
         ...(await cod.get()).data()["savedAttemptes"],
         [new Date().toLocaleDateString()]: {
-          start: new Date().toISOString(),
+          ...respo["savedAttemptes"][new Date().toLocaleDateString()],
+          [new Date().toISOString()]: "start",
         },
       },
     })
@@ -192,72 +193,47 @@ exports.login = onRequest(async (request, response) => {
 
   const cod = usersCol.doc(Body.uid.toString());
   const respo = (await cod.get()).data();
+  const errors = [];
+  const distance = getDistFromLatLonInKm(
+    Body.lat,
+    Body.long,
+    respo.savedLocation[1],
+    respo.savedLocation[0],
+  );
 
-  if (
-    Body.w3w[0] === respo["savedW3W"][0] &&
-    Body.w3w[1] === respo["savedW3W"][1] &&
-    Body.w3w[2] === respo["savedW3W"][2]
-  ) {
-    if (
-      getDistFromLatLonInKm(
-        Body.lat,
-        Body.long,
-        respo.savedLocation[0],
-        respo.savedLocation[1],
-      ) <= 0.5
-    ) {
-      cod
-        .update({
-          savedAttemptes: {
-            ...respo["savedAttemptes"],
-            [new Date().toLocaleDateString()]: {
-              ...respo["savedAttemptes"][new Date().toLocaleDateString()],
-              end: new Date().toISOString(),
-            },
-          },
-        })
-        .then(function () {
-          return response.status(200).send("Ok");
-        })
-        .catch(function (error) {
-          return response.status(500).send("Error updating document: " + error);
-        });
-    } else {
-      cod
-        .update({
-          savedAttemptes: {
-            ...respo["savedAttemptes"],
-            [new Date().toLocaleDateString()]: {
-              ...respo["savedAttemptes"][new Date().toLocaleDateString()],
-              [new Date().toISOString()]: "Wrong location",
-            },
-          },
-        })
-        .then(function () {
-          return response.status(401).send("Wrong location");
-        })
-        .catch(function (error) {
-          return response.status(500).send("Error updating document: " + error);
-        });
-    }
-  } else {
-    cod
-      .update({
-        savedAttemptes: {
-          ...respo["savedAttemptes"],
-          [new Date().toLocaleDateString()]: {
-            ...respo["savedAttemptes"][new Date().toLocaleDateString()],
-            [new Date().toISOString()]: "Wrong W3W",
+  (Body.w3w[0] !== respo["savedW3W"][0] ||
+    Body.w3w[1] !== respo["savedW3W"][1] ||
+    Body.w3w[2] !== respo["savedW3W"][2]) &&
+    errors.push("Wrong W3W");
+
+  distance >= 0.5 && errors.push("Wrong location");
+
+  cod
+    .update({
+      savedAttemptes: {
+        ...respo["savedAttemptes"],
+        [new Date().toLocaleDateString()]: {
+          ...respo["savedAttemptes"][new Date().toLocaleDateString()],
+          [new Date().toISOString()]: {
+            state: errors.length === 0 ? "Success" : errors,
+            w3w: Body.w3w,
+            distance: distance,
+            mapCompleationTime: Body.mapCompleationTime,
+            startLoginTime: Body.startLogin,
           },
         },
-      })
-      .then(function () {
-        return response.status(401).send("Wrong W3W");
-      })
-      .catch(function (error) {
-        return response.status(500).send("Error updating document: " + error);
-      });
-  }
+      },
+    })
+    .then(function () {
+      if (errors.length === 0) {
+        return response.status(200).send("Ok");
+      } else {
+        return response.status(401).send(errors);
+      }
+    })
+    .catch(function (error) {
+      return response.status(500).send("Error updating document: " + error);
+    });
 });
 
 /**
