@@ -25,8 +25,16 @@ async function verifyID(setError, setLoading) {
 }
 
 export default function IndexPage() {
-  const { setUid, uid, loading, setLoading, error, setError, incorectLogin, setStartLogin } =
-    useAuthStore();
+  const {
+    setUid,
+    uid,
+    loading,
+    setLoading,
+    error,
+    setError,
+    incorectLogin,
+    setStartLogin,
+  } = useAuthStore();
   let router = useRouter();
 
   const handleFormSubmit = async (event) => {
@@ -50,7 +58,7 @@ export default function IndexPage() {
       <p className="text-xl leading-8 text-gray-600 border-t border-gray-900/10 ">
         Please Enter your Referal number that you where sent by email.
       </p>
-      <div >
+      <div>
         {error && (
           <Banner type="error">
             There was an error verifying your details. Please try again.
