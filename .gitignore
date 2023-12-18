@@ -69,3 +69,6 @@ node_modules/
 .next
 .hosting
 .public
+testData
+
+hosting/next.config.js

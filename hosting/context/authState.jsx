@@ -14,6 +14,8 @@ export const useAuthStore = create((set) => ({
   loading: false,
   error: false,
   incorectLogin: false,
+  mapCompleationTime: undefined,
+  startLogin: undefined,
   setCoordinates: (coordinates) => set({ coordinates }),
   setw3wLoc: (w3wLoc) => set(() => ({ w3wLoc: w3wLoc })),
   setUid: (uid) => set(() => ({ uid: uid })),
@@ -21,4 +23,6 @@ export const useAuthStore = create((set) => ({
   setError: (error) => set(() => ({ error: error })),
   setIncorectLogin: (incorectLogin) =>
     set(() => ({ incorectLogin: incorectLogin })),
+  setMapCompleationTime: (mapCompleationTime) => set({ mapCompleationTime }),
+  setStartLogin: (startLogin) => set({ startLogin }),
 }));

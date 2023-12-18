@@ -34,6 +34,8 @@ export default function LoginComponent() {
     error,
     setError,
     setIncorectLogin,
+    mapCompleationTime,
+    startLogin,
   } = useAuthStore();
   const [mapError, setMapError] = useState(false);
 
@@ -47,6 +49,8 @@ export default function LoginComponent() {
       lat: coordinates[0],
       long: coordinates[1],
       w3w: w3wLoc,
+      mapCompleationTime: mapCompleationTime,
+      startLogin: startLogin,
     };
     var formBody = JSON.stringify(details);
 
@@ -75,12 +79,13 @@ export default function LoginComponent() {
     <StepProgressBar
       startingStep={0}
       onSubmit={onFormSubmit}
+      wrapperClass="w-full"
       steps={[
         {
           label: "Step 1",
           name: "step 1",
           content: (
-            <div className="sm:px-10 mx-10">
+            <div>
               {/* <W3Wpresentor readOnly={true} /> */}
               <h2 className="mb-4 text-2xl tracking-tight text-gray-900 sm:text-2xl">
                 Map Location
@@ -92,10 +97,7 @@ export default function LoginComponent() {
                 </Banner>
               )}
               <p className="mb-6">
-                Please select a location on the map below that you can easily
-                remember. This will be used to generate a 3 word pass phrase for
-                you to use as your password. you should try to remember this,
-                but it shoud also not be something that is easy to guess.
+                Please select the location you selected when you signed up.
               </p>
               <Banner type="info">
                 Please ensure you have seleted a location on the map before
@@ -116,10 +118,7 @@ export default function LoginComponent() {
               </h2>
 
               <p className="mb-6">
-                From the location you chose on the last page we have generated a
-                3 word pass phrase for you. You should store this how you'd
-                normaly store a password. you'll be promped on this at sceduled
-                periods as part of the study.
+                Please enter the pass phrase you created when you signed up.
               </p>
               <W3Wpresentor setError={setError} />
             </div>
