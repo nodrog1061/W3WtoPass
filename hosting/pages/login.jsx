@@ -46,8 +46,8 @@ export default function LoginComponent() {
 
     var details = {
       uid: uid,
-      lat: coordinates[0],
-      long: coordinates[1],
+      lat: coordinates[1],
+      long: coordinates[0],
       w3w: w3wLoc,
       mapCompleationTime: mapCompleationTime,
       startLogin: startLogin,

@@ -60,7 +60,7 @@ exports.automatedRegistration = onRequest(async (request, response) => {
   const dataToServer = {
     uid: uid,
     timePlan: timePlan,
-    savedLocation: [],
+    savedLocation: {},
     savedW3W: [],
     savedAttemptes: {
       bbb: "bbb",
@@ -135,7 +135,10 @@ exports.signUp = onRequest(async (request, response) => {
   usersCol
     .doc(Body.uid.toString())
     .update({
-      savedLocation: [request.body["lat"], request.body["long"]],
+      savedLocation: {
+        lat: request.body["lat"],
+        long: request.body["long"],
+      },
       savedW3W: request.body["w3w"],
       accountSetupCompleted: true,
     })
@@ -197,8 +200,8 @@ exports.login = onRequest(async (request, response) => {
   const distance = getDistFromLatLonInKm(
     Body.lat,
     Body.long,
-    respo.savedLocation[1],
-    respo.savedLocation[0],
+    respo.savedLocation.lat,
+    respo.savedLocation.long,
   );
 
   (Body.w3w[0] !== respo["savedW3W"][0] ||
