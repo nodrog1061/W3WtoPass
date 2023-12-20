@@ -24,7 +24,8 @@ export async function coordinatesToW3W(latLng, setw3wLoc) {
 
 export default function MapComponent({ login = false }) {
   const locLimited = false;
-  const { setw3wLoc, setCoordinates, coordinates, setMapCompleationTime } = useAuthStore();
+  const { setw3wLoc, setCoordinates, coordinates, setMapCompleationTime } =
+    useAuthStore();
   const [startLoc, setStartLoc] = useState();
 
   const handleMapClick = async (map, evt) => {
@@ -40,12 +41,12 @@ export default function MapComponent({ login = false }) {
   };
 
   useEffect(() => {
-    if ('geolocation' in navigator) {
+    if ("geolocation" in navigator) {
       // Retrieve latitude & longitude coordinates from `navigator.geolocation` Web API
       navigator.geolocation.getCurrentPosition(({ coords }) => {
         const { latitude, longitude } = coords;
         setStartLoc({ latitude, longitude });
-      })
+      });
     }
   }, []);
 
@@ -73,7 +74,11 @@ export default function MapComponent({ login = false }) {
             [0.0287, 51.5851],
           ]
         }
-        center={startLoc? [startLoc.longitude, startLoc.latitude] : [ -0.2416815, 51.5285582 ]}
+        center={
+          startLoc
+            ? [startLoc.longitude, startLoc.latitude]
+            : [-0.2416815, 51.5285582]
+        }
       >
         <ZoomControl />
         {coordinates[0] !== undefined && (

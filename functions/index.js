@@ -162,6 +162,12 @@ exports.startLogin = onRequest(async (request, response) => {
   console.log((await cod.get()).data()['savedAttemptes']);
 
   cod
+    .update({
+      savedAttemptes: {
+        ...(await cod.get()).data()["savedAttemptes"],
+        [new Date().toLocaleDateString()]: {
+          ...respo["savedAttemptes"][new Date().toLocaleDateString()],
+          [new Date().toISOString()]: "start",
       .update({
         savedAttemptes: {
           ...(await cod.get()).data()['savedAttemptes'],
