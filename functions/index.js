@@ -43,37 +43,31 @@ exports.automatedRegistration = onRequest(async (request, response) => {
   let uid = Math.floor(1000 + Math.random() * 9000);
   const timePlan = Math.floor(Math.random() * 3) + 1;
 
-  let snapshot = await admin
-      .firestore()
-      .collection('users')
-      .doc(uid.toString())
-      .get();
+  let snapshot =
+      await admin.firestore().collection('users').doc(uid.toString()).get();
 
   while (snapshot.exists) {
     uid = Math.floor(Math.random() * 99999) + 1;
 
-    snapshot = await admin
-        .firestore()
-        .collection('users')
-        .doc(uid.toString())
-        .get();
+    snapshot =
+        await admin.firestore().collection('users').doc(uid.toString()).get();
   }
   const dataToServer = {
-    uid: uid,
-    timePlan: timePlan,
-    savedLocation: {},
-    savedW3W: [],
-    savedAttemptes: {
-      bbb: 'bbb',
+    uid : uid,
+    timePlan : timePlan,
+    savedLocation : {},
+    savedW3W : [],
+    savedAttemptes : {
+      bbb : 'bbb',
     },
-    accountRegistratedAt: new Date().toISOString(),
-    accountSetupCompleted: false,
+    accountRegistratedAt : new Date().toISOString(),
+    accountSetupCompleted : false,
   };
   await usersCol.doc(uid.toString()).set(dataToServer);
 
   const dataToRespond = {
-    uid: uid,
-    timePlan: timePlan,
+    uid : uid,
+    timePlan : timePlan,
   };
   response.json(dataToRespond);
 });
@@ -85,16 +79,15 @@ exports.checkID = onRequest(async (request, response) => {
     return response.status(400).send('UID is required');
   }
 
-  await admin
-      .firestore()
+  await admin.firestore()
       .collection('users')
       .doc(Body.uid.toString())
       .get()
       .then(function(doc) {
         if (doc.exists) {
           const dataToRespond = {
-            uid: doc.data().uid,
-            accountSetupCompleted: doc.data().accountSetupCompleted,
+            uid : doc.data().uid,
+            accountSetupCompleted : doc.data().accountSetupCompleted,
           };
           response.json(dataToRespond);
         } else {
@@ -121,11 +114,10 @@ exports.signUp = onRequest(async (request, response) => {
     return response.status(400).send('W3W is required');
   }
 
-  const snapshot = await admin
-      .firestore()
-      .collection('users')
-      .doc(Body.uid.toString())
-      .get();
+  const snapshot = await admin.firestore()
+                       .collection('users')
+                       .doc(Body.uid.toString())
+                       .get();
   if (!snapshot.exists) {
     return response.status(400).send('User does not exist');
   }
@@ -133,15 +125,14 @@ exports.signUp = onRequest(async (request, response) => {
     return response.status(400).send('User already setup');
   }
 
-  usersCol
-      .doc(Body.uid.toString())
+  usersCol.doc(Body.uid.toString())
       .update({
-        savedLocation: {
-          lat: request.body['lat'],
-          long: request.body['long'],
+        savedLocation : {
+          lat : request.body['lat'],
+          long : request.body['long'],
         },
-        savedW3W: request.body['w3w'],
-        accountSetupCompleted: true,
+        savedW3W : request.body['w3w'],
+        accountSetupCompleted : true,
       })
       .then(function() {
         return response.status(200).send('Successfully updated!');
@@ -162,16 +153,15 @@ exports.startLogin = onRequest(async (request, response) => {
 
   console.log((await cod.get()).data()['savedAttemptes']);
 
-  cod
-      .update({
-        savedAttemptes: {
-          ...(await cod.get()).data()['savedAttemptes'],
-          [new Date().toLocaleDateString()]: {
-            ...respo['savedAttemptes'][new Date().toLocaleDateString()],
-            [new Date().toISOString()]: 'start',
-          },
-        },
-      })
+  cod.update({
+       savedAttemptes : {
+         ...(await cod.get()).data()['savedAttemptes'],
+         [new Date().toLocaleDateString()] : {
+           ...respo['savedAttemptes'][new Date().toLocaleDateString()],
+           [new Date().toISOString()] : 'start',
+         },
+       },
+     })
       .then(function() {
         return response.status(200).send('Successfully updated!');
       })
@@ -211,28 +201,27 @@ exports.login = onRequest(async (request, response) => {
   ];
 
   (formatedW3W[0] !== respo['savedW3W'][0] ||
-    formatedW3W[1] !== respo['savedW3W'][1] ||
-    formatedW3W[2] !== respo['savedW3W'][2]) &&
-    errors.push('Wrong W3W');
+   formatedW3W[1] !== respo['savedW3W'][1] ||
+   formatedW3W[2] !== respo['savedW3W'][2]) &&
+      errors.push('Wrong W3W');
 
   distance >= 0.5 && errors.push('Wrong location');
 
-  cod
-      .update({
-        savedAttemptes: {
-          ...respo['savedAttemptes'],
-          [new Date().toLocaleDateString()]: {
-            ...respo['savedAttemptes'][new Date().toLocaleDateString()],
-            [new Date().toISOString()]: {
-              state: errors.length === 0 ? 'Success' : errors,
-              w3w: Body.w3w,
-              distance: distance,
-              mapCompleationTime: Body.mapCompleationTime,
-              startLoginTime: Body.startLogin,
-            },
-          },
-        },
-      })
+  cod.update({
+       savedAttemptes : {
+         ...respo['savedAttemptes'],
+         [new Date().toLocaleDateString()] : {
+           ...respo['savedAttemptes'][new Date().toLocaleDateString()],
+           [new Date().toISOString()] : {
+             state : errors.length === 0 ? 'Success' : errors,
+             w3w : Body.w3w,
+             distance : distance,
+             mapCompleationTime : Body.mapCompleationTime,
+             startLoginTime : Body.startLogin,
+           },
+         },
+       },
+     })
       .then(function() {
         if (errors.length === 0) {
           return response.status(200).send('Ok');
@@ -257,12 +246,9 @@ function getDistFromLatLonInKm(lat1, long1, lat2, long2) {
   const R = 6371; // Rad of Earth in Km
   const dLat = deg2Rad(lat2 - lat1);
   const dLong = deg2Rad(long2 - long1);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(deg2Rad(lat1)) *
-      Math.cos(deg2Rad(lat2)) *
-      Math.sin(dLong / 2) *
-      Math.sin(dLong / 2);
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2Rad(lat1)) * Math.cos(deg2Rad(lat2)) *
+                Math.sin(dLong / 2) * Math.sin(dLong / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const d = R * c;
   return d;
@@ -273,42 +259,46 @@ function getDistFromLatLonInKm(lat1, long1, lat2, long2) {
  * @param {number} deg - Degree value to be converted to radians.
  * @return {number} - Radian value.
  */
-function deg2Rad(deg) {
-  return deg * (Math.PI / 180);
-}
-
+function deg2Rad(deg) { return deg * (Math.PI / 180); }
 
 exports.exportData = onRequest(async (request, response) => {
   const Body = request.body;
 
-  const respos = (await db.collection('users').get()).docs.map(doc => doc.data());
+  const respos =
+      (await db.collection('users').get()).docs.map(doc => doc.data());
 
   let reply = [];
 
   for (respo of respos) {
-    if (!respo.accountSetupCompleted) continue;
+    if (!respo.accountSetupCompleted)
+      continue;
 
     for (const [key, value] of Object.entries(respo.savedAttemptes)) {
-      if (key === 'bbb') continue;
+      if (key === 'bbb')
+        continue;
       var attemptes = 0;
       for (const [bot_key, bot_value] of Object.entries(value)) {
         attemptes++;
         const startLoginTime = new Date(bot_value.startLoginTime);
         const mapCompleationTime = new Date(bot_value.mapCompleationTime);
         const endLoginTime = new Date(bot_key);
-        const timeDiff = Math.abs(startLoginTime.getTime() - mapCompleationTime.getTime()) / 1000;
-        const timeDiff2 = Math.abs(endLoginTime.getTime() - mapCompleationTime.getTime()) / 1000;
+        const timeDiff =
+            Math.abs(startLoginTime.getTime() - mapCompleationTime.getTime()) /
+            1000;
+        const timeDiff2 =
+            Math.abs(endLoginTime.getTime() - mapCompleationTime.getTime()) /
+            1000;
 
         reply.push({
-          uid: respo.uid,
-          date: key,
-          state: bot_value.state,
-          w3w: bot_value.w3w,
-          distance: bot_value.distance,
-          timeOnMap: timeDiff,
-          timeOnW3W: timeDiff2,
-          attempt: attemptes,
-          plan: respo.timePlan,
+          uid : respo.uid,
+          date : key,
+          state : bot_value.state,
+          w3w : bot_value.w3w,
+          distance : bot_value.distance,
+          timeOnMap : timeDiff,
+          timeOnW3W : timeDiff2,
+          attempt : attemptes,
+          plan : respo.timePlan,
         });
       }
     }
@@ -316,12 +306,8 @@ exports.exportData = onRequest(async (request, response) => {
   const parser = new Parser();
   const csv = parser.parse(reply);
 
-  response.setHeader(
-    "Content-disposition",
-    "attachment; filename=report.csv"
-  )
+  response.setHeader("Content-disposition", "attachment; filename=report.csv")
   response.set("Content-Type", "text/csv")
 
   response.status(200).send(csv);
-
 });
