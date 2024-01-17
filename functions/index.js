@@ -9,6 +9,7 @@
  */
 
 const { onRequest } = require("firebase-functions/v2/https");
+const { Parser } = require("@json2csv/plainjs");
 // const timePlans = require("./timePlans");
 
 const admin = require("firebase-admin");
@@ -203,10 +204,15 @@ exports.login = onRequest(async (request, response) => {
     respo.savedLocation.lat,
     respo.savedLocation.long,
   );
+  const formatedW3W = [
+    Body.w3w[0].toLowerCase().trim(),
+    Body.w3w[1].toLowerCase().trim(),
+    Body.w3w[2].toLowerCase().trim(),
+  ];
 
-  (Body.w3w[0] !== respo["savedW3W"][0] ||
-    Body.w3w[1] !== respo["savedW3W"][1] ||
-    Body.w3w[2] !== respo["savedW3W"][2]) &&
+  (formatedW3W[0] !== respo["savedW3W"][0] ||
+    formatedW3W[1] !== respo["savedW3W"][1] ||
+    formatedW3W[2] !== respo["savedW3W"][2]) &&
     errors.push("Wrong W3W");
 
   distance >= 0.5 && errors.push("Wrong location");
@@ -270,3 +276,53 @@ function getDistFromLatLonInKm(lat1, long1, lat2, long2) {
 function deg2Rad(deg) {
   return deg * (Math.PI / 180);
 }
+
+exports.exportData = onRequest(async (request, response) => {
+  const Body = request.body;
+
+  const respos = (await db.collection("users").get()).docs.map((doc) =>
+    doc.data(),
+  );
+
+  let reply = [];
+
+  for (respo of respos) {
+    if (!respo.accountSetupCompleted) continue;
+
+    for (const [key, value] of Object.entries(respo.savedAttemptes)) {
+      if (key === "bbb") continue;
+      var attemptes = 0;
+      for (const [bot_key, bot_value] of Object.entries(value)) {
+        attemptes++;
+        const startLoginTime = new Date(bot_value.startLoginTime);
+        const mapCompleationTime = new Date(bot_value.mapCompleationTime);
+        const endLoginTime = new Date(bot_key);
+        const timeDiff =
+          Math.abs(startLoginTime.getTime() - mapCompleationTime.getTime()) /
+          1000;
+        const timeDiff2 =
+          Math.abs(endLoginTime.getTime() - mapCompleationTime.getTime()) /
+          1000;
+
+        reply.push({
+          uid: respo.uid,
+          date: key,
+          state: bot_value.state,
+          w3w: bot_value.w3w,
+          distance: bot_value.distance,
+          timeOnMap: timeDiff,
+          timeOnW3W: timeDiff2,
+          attempt: attemptes,
+          plan: respo.timePlan,
+        });
+      }
+    }
+  }
+  const parser = new Parser();
+  const csv = parser.parse(reply);
+
+  response.setHeader("Content-disposition", "attachment; filename=report.csv");
+  response.set("Content-Type", "text/csv");
+
+  response.status(200).send(csv);
+});
