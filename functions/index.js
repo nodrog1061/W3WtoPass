@@ -8,13 +8,14 @@
  * https://firebase.google.com/docs/functions
  */
 
-const { onRequest } = require("firebase-functions/v2/https");
+const {onRequest} = require('firebase-functions/v2/https');
+const {Parser} = require('@json2csv/plainjs');
 // const timePlans = require("./timePlans");
 
-const admin = require("firebase-admin");
+const admin = require('firebase-admin');
 admin.initializeApp();
 const db = admin.firestore();
-const usersCol = db.collection("users");
+const usersCol = db.collection('users');
 
 // Create and deploy your first functions
 // https://firebase.google.com/docs/functions/get-started
@@ -43,19 +44,19 @@ exports.automatedRegistration = onRequest(async (request, response) => {
   const timePlan = Math.floor(Math.random() * 3) + 1;
 
   let snapshot = await admin
-    .firestore()
-    .collection("users")
-    .doc(uid.toString())
-    .get();
+      .firestore()
+      .collection('users')
+      .doc(uid.toString())
+      .get();
 
   while (snapshot.exists) {
     uid = Math.floor(Math.random() * 99999) + 1;
 
     snapshot = await admin
-      .firestore()
-      .collection("users")
-      .doc(uid.toString())
-      .get();
+        .firestore()
+        .collection('users')
+        .doc(uid.toString())
+        .get();
   }
   const dataToServer = {
     uid: uid,
@@ -63,7 +64,7 @@ exports.automatedRegistration = onRequest(async (request, response) => {
     savedLocation: {},
     savedW3W: [],
     savedAttemptes: {
-      bbb: "bbb",
+      bbb: 'bbb',
     },
     accountRegistratedAt: new Date().toISOString(),
     accountSetupCompleted: false,
@@ -81,162 +82,167 @@ exports.checkID = onRequest(async (request, response) => {
   const Body = request.body;
 
   if (!Body.uid) {
-    return response.status(400).send("UID is required");
+    return response.status(400).send('UID is required');
   }
 
   await admin
-    .firestore()
-    .collection("users")
-    .doc(Body.uid.toString())
-    .get()
-    .then(function (doc) {
-      if (doc.exists) {
-        const dataToRespond = {
-          uid: doc.data().uid,
-          accountSetupCompleted: doc.data().accountSetupCompleted,
-        };
-        response.json(dataToRespond);
-      } else {
-        response.status(400).send("User does not exist");
-      }
-    })
-    .catch(function (error) {
-      response.status(500).send("Error getting document: " + error);
-    });
+      .firestore()
+      .collection('users')
+      .doc(Body.uid.toString())
+      .get()
+      .then(function(doc) {
+        if (doc.exists) {
+          const dataToRespond = {
+            uid: doc.data().uid,
+            accountSetupCompleted: doc.data().accountSetupCompleted,
+          };
+          response.json(dataToRespond);
+        } else {
+          response.status(400).send('User does not exist');
+        }
+      })
+      .catch(function(error) {
+        response.status(500).send('Error getting document: ' + error);
+      });
 });
 
 exports.signUp = onRequest(async (request, response) => {
   const Body = request.body;
 
   if (!Body.uid) {
-    return response.status(400).send("UID is required");
+    return response.status(400).send('UID is required');
   }
 
   if (!Body.lat || !Body.long) {
-    return response.status(400).send("Location is required");
+    return response.status(400).send('Location is required');
   }
 
   if (!Body.w3w) {
-    return response.status(400).send("W3W is required");
+    return response.status(400).send('W3W is required');
   }
 
   const snapshot = await admin
-    .firestore()
-    .collection("users")
-    .doc(Body.uid.toString())
-    .get();
+      .firestore()
+      .collection('users')
+      .doc(Body.uid.toString())
+      .get();
   if (!snapshot.exists) {
-    return response.status(400).send("User does not exist");
+    return response.status(400).send('User does not exist');
   }
   if (snapshot.data().accountSetupCompleted) {
-    return response.status(400).send("User already setup");
+    return response.status(400).send('User already setup');
   }
 
   usersCol
-    .doc(Body.uid.toString())
-    .update({
-      savedLocation: {
-        lat: request.body["lat"],
-        long: request.body["long"],
-      },
-      savedW3W: request.body["w3w"],
-      accountSetupCompleted: true,
-    })
-    .then(function () {
-      return response.status(200).send("Successfully updated!");
-    })
-    .catch(function (error) {
-      return response.status(500).send("Error updating document: " + error);
-    });
+      .doc(Body.uid.toString())
+      .update({
+        savedLocation: {
+          lat: request.body['lat'],
+          long: request.body['long'],
+        },
+        savedW3W: request.body['w3w'],
+        accountSetupCompleted: true,
+      })
+      .then(function() {
+        return response.status(200).send('Successfully updated!');
+      })
+      .catch(function(error) {
+        return response.status(500).send('Error updating document: ' + error);
+      });
 });
 
 exports.startLogin = onRequest(async (request, response) => {
   const Body = request.body;
 
   if (!Body.uid) {
-    return response.status(400).send("UID is required");
+    return response.status(400).send('UID is required');
   }
 
   const cod = usersCol.doc(Body.uid.toString());
 
-  console.log((await cod.get()).data()["savedAttemptes"]);
+  console.log((await cod.get()).data()['savedAttemptes']);
 
   cod
-    .update({
-      savedAttemptes: {
-        ...(await cod.get()).data()["savedAttemptes"],
-        [new Date().toLocaleDateString()]: {
-          ...respo["savedAttemptes"][new Date().toLocaleDateString()],
-          [new Date().toISOString()]: "start",
+      .update({
+        savedAttemptes: {
+          ...(await cod.get()).data()['savedAttemptes'],
+          [new Date().toLocaleDateString()]: {
+            ...respo['savedAttemptes'][new Date().toLocaleDateString()],
+            [new Date().toISOString()]: 'start',
+          },
         },
-      },
-    })
-    .then(function () {
-      return response.status(200).send("Successfully updated!");
-    })
-    .catch(function (error) {
-      return response.status(500).send("Error updating document: " + error);
-    });
+      })
+      .then(function() {
+        return response.status(200).send('Successfully updated!');
+      })
+      .catch(function(error) {
+        return response.status(500).send('Error updating document: ' + error);
+      });
 });
 
 exports.login = onRequest(async (request, response) => {
   const Body = request.body;
 
   if (!Body.uid) {
-    return response.status(400).send("UID is required");
+    return response.status(400).send('UID is required');
   }
 
   if (!Body.lat || !Body.long) {
-    return response.status(400).send("Location is required");
+    return response.status(400).send('Location is required');
   }
 
   if (!Body.w3w) {
-    return response.status(400).send("W3W is required");
+    return response.status(400).send('W3W is required');
   }
 
   const cod = usersCol.doc(Body.uid.toString());
   const respo = (await cod.get()).data();
   const errors = [];
   const distance = getDistFromLatLonInKm(
-    Body.lat,
-    Body.long,
-    respo.savedLocation.lat,
-    respo.savedLocation.long,
+      Body.lat,
+      Body.long,
+      respo.savedLocation.lat,
+      respo.savedLocation.long,
   );
+  const formatedW3W = [
+    Body.w3w[0].toLowerCase().trim(),
+    Body.w3w[1].toLowerCase().trim(),
+    Body.w3w[2].toLowerCase().trim(),
+  ];
 
-  (Body.w3w[0] !== respo["savedW3W"][0] ||
-    Body.w3w[1] !== respo["savedW3W"][1] ||
-    Body.w3w[2] !== respo["savedW3W"][2]) &&
-    errors.push("Wrong W3W");
+  (formatedW3W[0] !== respo['savedW3W'][0] ||
+    formatedW3W[1] !== respo['savedW3W'][1] ||
+    formatedW3W[2] !== respo['savedW3W'][2]) &&
+    errors.push('Wrong W3W');
 
-  distance >= 0.5 && errors.push("Wrong location");
+  distance >= 0.5 && errors.push('Wrong location');
 
   cod
-    .update({
-      savedAttemptes: {
-        ...respo["savedAttemptes"],
-        [new Date().toLocaleDateString()]: {
-          ...respo["savedAttemptes"][new Date().toLocaleDateString()],
-          [new Date().toISOString()]: {
-            state: errors.length === 0 ? "Success" : errors,
-            w3w: Body.w3w,
-            distance: distance,
-            mapCompleationTime: Body.mapCompleationTime,
-            startLoginTime: Body.startLogin,
+      .update({
+        savedAttemptes: {
+          ...respo['savedAttemptes'],
+          [new Date().toLocaleDateString()]: {
+            ...respo['savedAttemptes'][new Date().toLocaleDateString()],
+            [new Date().toISOString()]: {
+              state: errors.length === 0 ? 'Success' : errors,
+              w3w: Body.w3w,
+              distance: distance,
+              mapCompleationTime: Body.mapCompleationTime,
+              startLoginTime: Body.startLogin,
+            },
           },
         },
-      },
-    })
-    .then(function () {
-      if (errors.length === 0) {
-        return response.status(200).send("Ok");
-      } else {
-        return response.status(401).send(errors);
-      }
-    })
-    .catch(function (error) {
-      return response.status(500).send("Error updating document: " + error);
-    });
+      })
+      .then(function() {
+        if (errors.length === 0) {
+          return response.status(200).send('Ok');
+        } else {
+          return response.status(401).send(errors);
+        }
+      })
+      .catch(function(error) {
+        return response.status(500).send('Error updating document: ' + error);
+      });
 });
 
 /**
@@ -270,3 +276,52 @@ function getDistFromLatLonInKm(lat1, long1, lat2, long2) {
 function deg2Rad(deg) {
   return deg * (Math.PI / 180);
 }
+
+
+exports.exportData = onRequest(async (request, response) => {
+  const Body = request.body;
+
+  const respos = (await db.collection('users').get()).docs.map(doc => doc.data());
+
+  let reply = [];
+
+  for (respo of respos) {
+    if (!respo.accountSetupCompleted) continue;
+
+    for (const [key, value] of Object.entries(respo.savedAttemptes)) {
+      if (key === 'bbb') continue;
+      var attemptes = 0;
+      for (const [bot_key, bot_value] of Object.entries(value)) {
+        attemptes++;
+        const startLoginTime = new Date(bot_value.startLoginTime);
+        const mapCompleationTime = new Date(bot_value.mapCompleationTime);
+        const endLoginTime = new Date(bot_key);
+        const timeDiff = Math.abs(startLoginTime.getTime() - mapCompleationTime.getTime()) / 1000;
+        const timeDiff2 = Math.abs(endLoginTime.getTime() - mapCompleationTime.getTime()) / 1000;
+
+        reply.push({
+          uid: respo.uid,
+          date: key,
+          state: bot_value.state,
+          w3w: bot_value.w3w,
+          distance: bot_value.distance,
+          timeOnMap: timeDiff,
+          timeOnW3W: timeDiff2,
+          attempt: attemptes,
+          plan: respo.timePlan,
+        });
+      }
+    }
+  }
+  const parser = new Parser();
+  const csv = parser.parse(reply);
+
+  response.setHeader(
+    "Content-disposition",
+    "attachment; filename=report.csv"
+  )
+  response.set("Content-Type", "text/csv")
+
+  response.status(200).send(csv);
+
+});
