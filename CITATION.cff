@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Taylor"
+  given-names: "Lewis"
+  orcid: "https://orcid.org/0009-0005-1299-3315"
+title: "W3WtoPass"
+version: 0.1.0
+doi: 10.5281/zenodo.1234
+date-released: 2024-05-18
+url: "https://github.com/nodrog1061/W3WtoPass"
